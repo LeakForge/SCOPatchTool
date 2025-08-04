@@ -1,0 +1,108 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
+
+namespace GTA_SCO_Signature_Patch_Tool
+{
+    public partial class Form1 : Form
+    {
+        public static string GetBytesToString(byte[] value)
+        {
+            SoapHexBinary shb = new SoapHexBinary(value);
+            return shb.ToString();
+        }
+
+        byte[] GTAIVPC = { 0x00, 0x44, 0x20, 0x7E };
+        byte[] TBoGTPC = { 0x4A, 0xA4, 0x4B, 0x39 };
+        byte[] TLADPC = { 0x3F, 0xA5, 0xFA, 0x2D };
+        byte[] GTAIVConsole = { 0x1C, 0xE6, 0xD1, 0x7D };
+        byte[] TBoGTConsole = { 0x42, 0x75, 0xE7, 0x38 };
+        byte[] TLADConsole = { 0x95, 0x21, 0xCD, 0x2D };
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DialogResult result = openFileDialog1.ShowDialog();
+            openFileDialog1.Filter = "SCO Files (.sco)|*.sco|All Files (*.*)|*.*";
+            openFileDialog1.Title = ("Open .sco file");
+            if (result == DialogResult.OK)
+            {
+                try
+                {
+                    BinaryReader reader = new BinaryReader(new FileStream(openFileDialog1.FileName, FileMode.Open));
+                    reader.BaseStream.Position = 20;
+                    byte[] Hmm = reader.ReadBytes(4);
+                    string sig = GetBytesToString(Hmm);
+
+                    switch (sig)
+                    {
+                        case "0044207E":
+                            comboBox1.SelectedIndex = 0;
+                            break;
+                        case "4AA44B39":
+                            comboBox1.SelectedIndex = 1;
+                            break;
+                        case "3FA5FA2D":
+                            comboBox1.SelectedIndex = 2;
+                            break;
+                        case "1CE6D17D":
+                            comboBox1.SelectedIndex = 3;
+                            break;
+                        case "4275E738":
+                            comboBox1.SelectedIndex = 4;
+                            break;
+                        case "9521CD2D":
+                            comboBox1.SelectedIndex = 5;
+                            break;
+                    }
+                    reader.Close();
+                }
+                catch (IOException)
+                {
+
+                }
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            BinaryWriter writer = new BinaryWriter(new FileStream(openFileDialog1.FileName, FileMode.Open));
+            writer.BaseStream.Position = 20;
+            switch (comboBox1.SelectedIndex)
+            {
+                case 0:
+                    writer.Write(GTAIVPC);
+                    break;
+                case 1:
+                    writer.Write(TBoGTPC);
+                    break;
+                case 2:
+                    writer.Write(TLADPC);
+                    break;
+                case 3:
+                    writer.Write(GTAIVConsole);
+                    break;
+                case 4:
+                    writer.Write(TBoGTConsole);
+                    break;
+                case 5:
+                    writer.Write(TLADConsole);
+                    break;
+            }
+            MessageBox.Show("Signature has been changed!", "Done!");
+            writer.Close();
+        }
+    }
+}

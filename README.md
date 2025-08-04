@@ -7,4 +7,4 @@ This tool will allow you to convert .SCO's to different versions of the game and
 
 ## Credits
 
-[Evil Blunt]( for posting the signatures.
+[Evil Blunt](https://www.se7ensins.com/members/evil-blunt.252207/) for posting the signatures.
